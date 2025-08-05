@@ -6,7 +6,13 @@ interface CardProps extends HTMLAttributes<HTMLDivElement> {
   variant?: 'default' | 'bordered' | 'elevated';
 }
 
-const Card: React.FC<CardProps> = ({
+interface CardComponent extends React.FC<CardProps> {
+  Header: React.FC<CardHeaderProps>;
+  Body: React.FC<CardBodyProps>;
+  Footer: React.FC<CardFooterProps>;
+}
+
+const Card: CardComponent = ({
   children,
   variant = 'default',
   className,
@@ -90,8 +96,8 @@ const CardFooter: React.FC<CardFooterProps> = ({
 };
 
 // Compound component pattern
-Card.Header = CardHeader;
-Card.Body = CardBody;
-Card.Footer = CardFooter;
+(Card as CardComponent).Header = CardHeader;
+(Card as CardComponent).Body = CardBody;
+(Card as CardComponent).Footer = CardFooter;
 
-export default Card;
+export default Card as CardComponent;
