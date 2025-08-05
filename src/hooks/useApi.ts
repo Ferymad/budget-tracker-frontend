@@ -16,7 +16,7 @@ export function useApi<T>(
 ) {
   const [state, setState] = useState<UseApiState<T>>({
     data: null,
-    loading: options.immediate,
+    loading: options.immediate || false,
     error: null,
   });
 

@@ -159,7 +159,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     dispatch({ type: 'AUTH_START' });
 
     try {
-      const user = await authService.register(userData);
+      await authService.register(userData);
       
       // Auto-login after registration
       await login({ email: userData.email, password: userData.password });

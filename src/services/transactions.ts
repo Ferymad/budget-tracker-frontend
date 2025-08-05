@@ -3,8 +3,7 @@ import {
   Transaction, 
   TransactionCreate, 
   TransactionUpdate,
-  TransactionFilters,
-  PaginationParams 
+  TransactionFilters
 } from '@/types';
 
 export const transactionService = {
@@ -66,7 +65,12 @@ export const transactionService = {
   }> => {
     try {
       const response = await apiClient.get('/transactions/stats', filters);
-      return response.data;
+      return response.data as {
+        total_income: string;
+        total_expenses: string;
+        net_income: string;
+        transaction_count: number;
+      };
     } catch (error: any) {
       throw new Error(handleApiError(error));
     }
@@ -82,7 +86,13 @@ export const transactionService = {
   }>> => {
     try {
       const response = await apiClient.get('/transactions/spending-by-category', filters);
-      return response.data;
+      return response.data as Array<{
+        category_id: string;
+        category_name: string;
+        category_color: string;
+        total_amount: string;
+        transaction_count: number;
+      }>;
     } catch (error: any) {
       throw new Error(handleApiError(error));
     }
@@ -97,7 +107,12 @@ export const transactionService = {
   }>> => {
     try {
       const response = await apiClient.get('/transactions/monthly-spending', { year });
-      return response.data;
+      return response.data as Array<{
+        month: string;
+        income: string;
+        expenses: string;
+        net: string;
+      }>;
     } catch (error: any) {
       throw new Error(handleApiError(error));
     }

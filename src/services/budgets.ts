@@ -93,7 +93,15 @@ export const budgetService = {
   }>> => {
     try {
       const response = await apiClient.get('/budgets/alerts');
-      return response.data;
+      return response.data as Array<{
+        budget_id: string;
+        budget_name: string;
+        budget_amount: string;
+        spent_amount: string;
+        over_amount: string;
+        percentage_over: number;
+        category_name: string;
+      }>;
     } catch (error: any) {
       throw new Error(handleApiError(error));
     }

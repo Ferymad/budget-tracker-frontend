@@ -1,6 +1,6 @@
 import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
 import { API_BASE_URL } from '@/utils/constants';
-import { tokenStorage, jwtUtils } from '@/utils';
+import { tokenStorage } from '@/utils';
 import { Token, RefreshTokenRequest } from '@/types';
 
 // Create axios instance

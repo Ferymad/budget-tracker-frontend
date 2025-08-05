@@ -4,8 +4,7 @@ import {
   User, 
   UserCreate, 
   UserLogin, 
-  UserUpdate,
-  RefreshTokenRequest 
+  UserUpdate
 } from '@/types';
 
 export const authService = {

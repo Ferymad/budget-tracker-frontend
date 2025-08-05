@@ -12,7 +12,7 @@ interface CardComponent extends React.FC<CardProps> {
   Footer: React.FC<CardFooterProps>;
 }
 
-const Card: CardComponent = ({
+const CardBase: React.FC<CardProps> = ({
   children,
   variant = 'default',
   className,
@@ -96,8 +96,9 @@ const CardFooter: React.FC<CardFooterProps> = ({
 };
 
 // Compound component pattern
-(Card as CardComponent).Header = CardHeader;
-(Card as CardComponent).Body = CardBody;
-(Card as CardComponent).Footer = CardFooter;
+const Card = CardBase as CardComponent;
+Card.Header = CardHeader;
+Card.Body = CardBody;
+Card.Footer = CardFooter;
 
-export default Card as CardComponent;
+export default Card;

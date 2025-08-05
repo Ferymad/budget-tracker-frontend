@@ -64,7 +64,11 @@ export const categoryService = {
   }>> => {
     try {
       const response = await apiClient.get('/categories/with-stats');
-      return response.data;
+      return response.data as Array<Category & {
+        transaction_count: number;
+        total_amount: string;
+        last_transaction_date?: string;
+      }>;
     } catch (error: any) {
       throw new Error(handleApiError(error));
     }
