@@ -1,7 +1,7 @@
 import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
 import { API_BASE_URL } from '@/utils/constants';
 import { tokenStorage } from '@/utils';
-import { Token } from '@/types';
+// Token type not used in this file - only in auth.ts
 
 // Create axios instance
 const api: AxiosInstance = axios.create({
