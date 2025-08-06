@@ -3,6 +3,15 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import './styles/index.css';
 
+// Initialize performance debugging in development
+if (import.meta.env.DEV) {
+  import('./utils/performanceDebugger').then(({ PerformanceDebugger }) => {
+    // Auto-detect infinite loops
+    PerformanceDebugger.detectInfiniteLoop(5); // Alert after 5 rapid requests
+    console.log('🔧 Performance monitoring enabled');
+  });
+}
+
 // Error boundary component
 class ErrorBoundary extends React.Component<
   { children: React.ReactNode },

@@ -11,6 +11,8 @@ import {
 } from 'lucide-react';
 import { Card, Button, Loading, Alert } from '@/components/ui';
 import { useApi } from '@/hooks';
+import { useCircuitBreaker } from '@/hooks/useCircuitBreaker';
+import { usePerformanceMonitor } from '@/hooks/usePerformanceMonitor';
 import { transactionService, budgetService } from '@/services';
 import { formatCurrency, formatDate } from '@/utils';
 import { Transaction, BudgetProgress } from '@/types';
@@ -18,13 +20,34 @@ import { Transaction, BudgetProgress } from '@/types';
 const DashboardPage: React.FC = () => {
   const [recentTransactions, setRecentTransactions] = useState<Transaction[]>([]);
   const [budgetProgress, setBudgetProgress] = useState<BudgetProgress[]>([]);
+  
+  // Circuit breaker for API calls
+  const circuitBreaker = useCircuitBreaker({
+    failureThreshold: 3,
+    recoveryTimeMs: 15000,
+    requestTimeoutMs: 5000,
+  });
+  
+  // Performance monitoring
+  const { getMetrics } = usePerformanceMonitor('DashboardPage', (alert) => {
+    console.error('Dashboard Performance Alert:', alert);
+    
+    // If high frequency detected, show user warning
+    if (alert.type === 'high_frequency') {
+      console.warn('Too many requests detected. Please refresh the page if data seems stuck.');
+    }
+  });
 
-  // Fetch dashboard stats
+  // Fetch dashboard stats with circuit breaker protection
   const {
     data: stats,
     loading: statsLoading,
     error: statsError,
-  } = useApi(() => transactionService.getTransactionStats());
+    execute: refetchStats,
+  } = useApi(() => 
+    circuitBreaker.execute(() => transactionService.getTransactionStats()),
+    { immediate: true }
+  );
 
   // Load recent transactions and budget progress
   useEffect(() => {
@@ -54,10 +77,30 @@ const DashboardPage: React.FC = () => {
   }
 
   if (statsError) {
+    const circuitState = circuitBreaker.getState();
+    const isCircuitOpen = circuitState.state === 'OPEN';
+    
     return (
-      <Alert variant="error" className="mb-6">
-        Failed to load dashboard data: {statsError}
-      </Alert>
+      <div className="space-y-4">
+        <Alert variant="error" className="mb-6">
+          Failed to load dashboard data: {statsError}
+          {isCircuitOpen && (
+            <div className="mt-2 text-sm">
+              ⚠️ System protection activated. Retrying automatically in {Math.round((circuitState.nextAttemptTime - Date.now()) / 1000)}s
+            </div>
+          )}
+        </Alert>
+        {!isCircuitOpen && (
+          <div className="flex justify-center">
+            <button
+              onClick={() => refetchStats()}
+              className="px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700"
+            >
+              Retry Loading
+            </button>
+          </div>
+        )}
+      </div>
     );
   }
 

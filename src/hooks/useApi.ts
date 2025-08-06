@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { usePerformanceMonitor } from './usePerformanceMonitor';
 
 interface UseApiState<T> {
   data: T | null;
@@ -14,6 +15,16 @@ export function useApi<T>(
   apiFunction: () => Promise<T>,
   options: UseApiOptions = { immediate: true }
 ) {
+  const apiRef = useRef(apiFunction);
+  
+  // Always keep the latest apiFunction reference
+  apiRef.current = apiFunction;
+  
+  // Performance monitoring
+  const { trackRequest } = usePerformanceMonitor('useApi', (alert) => {
+    console.warn('Performance Alert:', alert);
+  });
+  
   const [state, setState] = useState<UseApiState<T>>({
     data: null,
     loading: options.immediate || false,
@@ -21,24 +32,28 @@ export function useApi<T>(
   });
 
   const execute = useCallback(async () => {
+    const startTime = Date.now();
     setState(prev => ({ ...prev, loading: true, error: null }));
     
     try {
-      const result = await apiFunction();
+      const result = await apiRef.current();
+      trackRequest(startTime, false);
       setState({ data: result, loading: false, error: null });
       return result;
     } catch (error) {
+      trackRequest(startTime, true);
       const errorMessage = error instanceof Error ? error.message : 'An error occurred';
       setState({ data: null, loading: false, error: errorMessage });
       throw error;
     }
-  }, [apiFunction]);
+  }, []); // ✅ FIXED: No dependencies, use ref for apiFunction
 
   useEffect(() => {
     if (options.immediate) {
       execute();
     }
-  }, [execute, options.immediate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [options.immediate]); // ✅ FIXED: Remove execute from dependencies
 
   const reset = useCallback(() => {
     setState({
@@ -59,6 +74,11 @@ export function useApi<T>(
 export function useMutation<T, P = any>(
   mutationFunction: (params: P) => Promise<T>
 ) {
+  const mutationRef = useRef(mutationFunction);
+  
+  // Always keep the latest mutationFunction reference
+  mutationRef.current = mutationFunction;
+  
   const [state, setState] = useState<UseApiState<T>>({
     data: null,
     loading: false,
@@ -69,7 +89,7 @@ export function useMutation<T, P = any>(
     setState(prev => ({ ...prev, loading: true, error: null }));
     
     try {
-      const result = await mutationFunction(params);
+      const result = await mutationRef.current(params);
       setState({ data: result, loading: false, error: null });
       return result;
     } catch (error) {
@@ -77,7 +97,7 @@ export function useMutation<T, P = any>(
       setState(prev => ({ ...prev, loading: false, error: errorMessage }));
       throw error;
     }
-  }, [mutationFunction]);
+  }, []); // ✅ FIXED: No dependencies, use ref for mutationFunction
 
   const reset = useCallback(() => {
     setState({
