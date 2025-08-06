@@ -7,6 +7,9 @@ RUN npm ci
 
 COPY . .
 
+# Remove any conflicting environment files
+RUN rm -f .env.production
+
 # Accept environment variables from Railway
 ARG VITE_API_BASE_URL
 ARG VITE_APP_NAME
