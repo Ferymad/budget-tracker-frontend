@@ -1,8 +1,5 @@
-// API Configuration - Railway must provide VITE_API_BASE_URL environment variable
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || (() => {
-  console.error('VITE_API_BASE_URL environment variable not set!');
-  return 'http://localhost:8000';
-})();
+// API Configuration - HARDCODED for Railway deployment
+export const API_BASE_URL = 'https://budget-tracker-backend-production-98f3.up.railway.app';
 
 // Token storage keys
 export const ACCESS_TOKEN_KEY = 'access_token';
