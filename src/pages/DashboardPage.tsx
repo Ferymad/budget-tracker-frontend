@@ -29,7 +29,7 @@ const DashboardPage: React.FC = () => {
   });
   
   // Performance monitoring
-  const { getMetrics } = usePerformanceMonitor('DashboardPage', (alert) => {
+  usePerformanceMonitor('DashboardPage', (alert) => {
     console.error('Dashboard Performance Alert:', alert);
     
     // If high frequency detected, show user warning

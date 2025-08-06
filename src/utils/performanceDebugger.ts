@@ -108,7 +108,7 @@ export const PerformanceDebugger = {
 };
 
 // Auto-start debugging in development
-if (process.env.NODE_ENV === 'development') {
+if (import.meta.env.MODE === 'development') {
   // Add to window for manual access
   (window as any).PerformanceDebugger = PerformanceDebugger;
   
