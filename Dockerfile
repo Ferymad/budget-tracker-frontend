@@ -6,6 +6,17 @@ COPY package*.json ./
 RUN npm ci
 
 COPY . .
+
+# Accept environment variables from Railway
+ARG VITE_API_BASE_URL
+ARG VITE_APP_NAME
+ARG VITE_APP_VERSION
+
+# Make environment variables available during build
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
+ENV VITE_APP_NAME=$VITE_APP_NAME
+ENV VITE_APP_VERSION=$VITE_APP_VERSION
+
 RUN npm run build
 
 # Production stage with Nginx
