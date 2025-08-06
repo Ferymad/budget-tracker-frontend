@@ -1,5 +1,8 @@
-// API Configuration - Railway will provide production URL
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+// API Configuration - Railway must provide VITE_API_BASE_URL environment variable
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || (() => {
+  console.error('VITE_API_BASE_URL environment variable not set!');
+  return 'http://localhost:8000';
+})();
 
 // Token storage keys
 export const ACCESS_TOKEN_KEY = 'access_token';
